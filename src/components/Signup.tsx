@@ -34,8 +34,12 @@ const Signup = () => {
             <input
               type="text"
               id="phone"
-              placeholder="+91"
+              placeholder="Enter Mobile Number"
+              maxLength={10} // Restrict input to 10 characters
+              pattern="\d{10}" // Allow only 10 digits
+              title="Please enter a valid 10-digit mobile number."
               className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              required
             />
           </div>
           <div className="flex justify-center items-center gap-3">

@@ -34,15 +34,17 @@ const AgentDashboard = () => {
                             <input
                                 type="text"
                                 placeholder="Enter Vehicle Number"
-                                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase"
+                                style={{ textTransform: "uppercase" }} // Inline style for fallback
+                                onChange={(e) => e.target.value = e.target.value.toUpperCase()} // Ensure uppercase in real-time
                             />
                             <button className="md:px-20 md:hidden  px-2 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600">
                                 Get&nbsp;RC
                             </button>
                         </div>
                         <button className="md:px-20 px-2 hidden md:flex py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600">
-                                Get&nbsp;RC
-                            </button>
+                            Get&nbsp;RC
+                        </button>
                     </div>
 
 
@@ -55,7 +57,7 @@ const AgentDashboard = () => {
                         <button className="bg-green-500 text-white py-2 md:px-10 px-3 rounded hover:bg-green-600">
                             Upload&nbsp;CSV
                         </button>
-                        
+
                     </div>
                 </div>
             </div>
