@@ -63,6 +63,9 @@ const Login = () => {
             Login
           </button>
         </form>
+        <Link to="/admindashboard" className="text-blue-500 font-semibold">
+          Admin Dashboard
+        </Link>
         <p className="text-center text-sm mt-4">
           Not a member?{" "}
           <Link to="/signup" className="text-blue-500 font-semibold">
