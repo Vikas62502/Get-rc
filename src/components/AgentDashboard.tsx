@@ -1,5 +1,4 @@
-import React from "react";
-import Header from "./Header";
+
 import caricon from '../assets/car.png'
 
 const AgentDashboard = () => {

@@ -1,6 +1,6 @@
-import React from "react";
+
 import { Link } from "react-router-dom";
-import Header from "./Header";
+
 import name from '../assets/user.png'
 import number from '../assets/phone.png'
 import email from '../assets/email.png'
