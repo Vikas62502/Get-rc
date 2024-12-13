@@ -97,7 +97,7 @@ const AdminDashboard = () => {
       {/* Modal */}
       {isModalOpen && selectedUser && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white gap-4 rounded-lg shadow-lg p-6 pt-0 w-[40%]">
+          <div className="bg-white gap-4 rounded-lg shadow-lg p-6 pt-0 lg:w-[40%] w-[90%]">
             <div className="w-full flex justify-end">
               <img
                 src={close}
@@ -107,9 +107,9 @@ const AdminDashboard = () => {
               />
             </div>
 
-            <div className="flex">
+            <div className="lg:flex">
               {selectedUser ? (
-                <div className="w-full text-lg flex flex-col gap-2">
+                <div className="w-full mb-6 lg:mb-0 text-lg flex flex-col gap-2">
                   <p>
                     <strong>Name</strong>: {selectedUser.name}
                   </p>
