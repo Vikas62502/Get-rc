@@ -1,26 +1,55 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import number from "../assets/phone.png";
 import pass from "../assets/padlock.png";
+import client from "../utils/axiosClient";
 
 const Login = () => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e: any) => {
+  const handleLogin = async (e: any) => {
     e.preventDefault();
+
     // Validate phone number length
     if (phone.length !== 10) {
       alert("Phone number must be exactly 10 digits.");
       return;
     }
-    // Example validation
-    if (phone === "9560611324" && password === "mohit") {
-      navigate("/agentdashboard");
-    } else {
-      alert("Invalid credentials");
+
+    try {
+      // Call login API
+      const response = await client.post("/api/login/user-login", {
+        mobile:phone,
+        password:password,
+      });
+      console.log(response,'res')
+      // Handle response
+      if (response.status === 200) {
+        const { role } = response.data; // Assuming the API response contains a `role` field
+
+        if (role === "User") {
+          alert("Login successful as Agent!");
+          navigate("/agentdashboard");
+        } else if (role === "admin") {
+          alert("Login successful as Admin!");
+          navigate("/admindashboard");
+        } else {
+          alert("Unknown role. Please contact support.");
+        }
+      } else {
+        alert("Invalid credentials");
+      }
+    } catch (error:any) {
+      // Handle API errors
+      if (error.response && error.response.data) {
+        alert(`Error: ${error.response.data.message}`);
+      } else {
+        alert("An error occurred. Please try again.");
+      }
     }
   };
 
@@ -63,9 +92,6 @@ const Login = () => {
             Login
           </button>
         </form>
-        <Link to="/admindashboard" className="text-blue-500 font-semibold">
-          Admin Dashboard
-        </Link>
         <p className="text-center text-sm mt-4">
           Not a member?{" "}
           <Link to="/signup" className="text-blue-500 font-semibold">
