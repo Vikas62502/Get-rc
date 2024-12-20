@@ -1,40 +1,50 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import client from "../utils/axiosClient";
 import number from "../assets/phone.png";
 import pass from "../assets/padlock.png";
-import client from "../utils/axiosClient";
 
 const Login = () => {
-  const [phone, setPhone] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const isValidPhone = (phone: string) => {
+    const phoneRegex = /^\d{10}$/;
+    return phoneRegex.test(phone);
+  };
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
 
-    // Validate phone number length
-    if (phone.length !== 10) {
-      alert("Phone number must be exactly 10 digits.");
+    // Validate identifier as either email or phone number
+    if (!isValidEmail(identifier) && !isValidPhone(identifier)) {
+      alert("Please enter a valid email or 10-digit mobile number.");
       return;
     }
 
     try {
       // Call login API
       const response = await client.post("/api/login/user-login", {
-        mobile:phone,
-        password:password,
+        emailOrPhone: identifier, // Can be email or phone
+        password,
       });
-      console.log(response,'res')
+
+      console.log(response, "res");
       // Handle response
       if (response.status === 200) {
-        const { role } = response.data; // Assuming the API response contains a `role` field
+        const { role } = response?.data?.user; // Assuming the API response contains a `role` field
 
         if (role === "User") {
           alert("Login successful as Agent!");
           navigate("/agentdashboard");
-        } else if (role === "admin") {
+        } else if (role === "Admin") {
           alert("Login successful as Admin!");
           navigate("/admindashboard");
         } else {
@@ -43,7 +53,7 @@ const Login = () => {
       } else {
         alert("Invalid credentials");
       }
-    } catch (error:any) {
+    } catch (error: any) {
       // Handle API errors
       if (error.response && error.response.data) {
         alert(`Error: ${error.response.data.message}`);
@@ -54,21 +64,18 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center  min-h-[90vh] bg-gradient-to-b from-cyan-200 to-white">
+    <div className="flex items-center justify-center min-h-[90vh] bg-gradient-to-b from-cyan-200 to-white">
       <div className="w-96 p-6 mx-5 lg:mx-0 bg-white rounded-lg shadow-lg">
         <h3 className="text-center text-lg font-semibold mb-4">Log in</h3>
         <form onSubmit={handleLogin} className="space-y-5">
           <div className="flex justify-center items-center gap-3">
-            <img src={number} alt="Phone icon" className="w-7 h-7" />
+            <img src={number} alt="Identifier icon" className="w-7 h-7" />
             <input
               type="text"
-              id="phone"
-              placeholder="Enter Mobile Number"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              maxLength={10} // Restrict input to 10 characters
-              pattern="\d{10}" // Allow only 10 digits
-              title="Please enter a valid 10-digit mobile number."
+              id="identifier"
+              placeholder="Enter Email or Mobile Number"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
               required
             />
