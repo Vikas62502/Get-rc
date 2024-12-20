@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-
 import name from "../assets/user.png";
 import number from "../assets/phone.png";
 import email from "../assets/email.png";
 import pass from "../assets/padlock.png";
 import client from "../utils/axiosClient";
+import { toast } from "sonner";
 
 const Signup = () => {
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -24,6 +24,8 @@ const Signup = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    const toastLoader = toast.loading("Signing up...")
+    setLoading(true)
     e.preventDefault();
 
     const { name, phone, email, password, confirmPassword } = formData;
@@ -47,13 +49,14 @@ const Signup = () => {
     try {
       // Call signup API
       const response = await client.post("/api/login/user-signup", {
-        fullname:name,
-        mobile:phone,
-        email:email,
-        password:password,
-        role:'User',
+        fullname: name,
+        mobile: phone,
+        email: email,
+        password: password,
+        role: 'User',
       });
-console.log(response,'res')
+      toast.success("Signup successful!")
+      console.log(response, 'res')
       // Handle success response
       if (response.status === 201) {
         alert("Signup successful!");
@@ -61,13 +64,16 @@ console.log(response,'res')
       } else {
         alert("Something went wrong. Please try again.");
       }
-    } catch (error:any) {
+    } catch (error: any) {
       // Handle API errors
       if (error.response && error.response.data) {
         alert(`Error: ${error.response.data.message}`);
       } else {
         alert("An error occurred. Please try again.");
       }
+    } finally {
+      toast.dismiss(toastLoader)
+      setLoading(false)
     }
   };
 
@@ -143,7 +149,7 @@ console.log(response,'res')
             type="submit"
             className="w-full py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600"
           >
-            Sign Up
+            {loading ? "Loading..." : "Sign Up"}
           </button>
         </form>
         <p className="text-center text-sm mt-4">

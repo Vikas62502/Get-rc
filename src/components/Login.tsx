@@ -4,10 +4,12 @@ import { Link } from "react-router-dom";
 import client from "../utils/axiosClient";
 import number from "../assets/phone.png";
 import pass from "../assets/padlock.png";
+import { toast } from "sonner";
 
 const Login = () => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
 
   const isValidEmail = (email: string) => {
@@ -21,6 +23,8 @@ const Login = () => {
   };
 
   const handleLogin = async (e: any) => {
+    const toastLoader = toast.loading("Logging in...")
+    setLoading(true)
     e.preventDefault();
 
     // Validate identifier as either email or phone number
@@ -31,21 +35,19 @@ const Login = () => {
 
     try {
       // Call login API
-      const response = await client.post("/api/login/user-login", {
+      const response: any = await client.post("/api/login/user-login", {
         emailOrPhone: identifier, // Can be email or phone
         password,
       });
-
+      toast.success("Login successful!")
       console.log(response, "res");
       // Handle response
       if (response.status === 200) {
         const { role } = response?.data?.user; // Assuming the API response contains a `role` field
 
         if (role === "User") {
-          alert("Login successful as Agent!");
           navigate("/agentdashboard");
         } else if (role === "Admin") {
-          alert("Login successful as Admin!");
           navigate("/admindashboard");
         } else {
           alert("Unknown role. Please contact support.");
@@ -60,6 +62,9 @@ const Login = () => {
       } else {
         alert("An error occurred. Please try again.");
       }
+    } finally {
+      toast.dismiss(toastLoader)
+      setLoading(false)
     }
   };
 
@@ -96,7 +101,7 @@ const Login = () => {
             type="submit"
             className="w-full py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600"
           >
-            Login
+            {loading ? "Loading..." : "Log in"}
           </button>
         </form>
         <p className="text-center text-sm mt-4">
