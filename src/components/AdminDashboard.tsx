@@ -1,6 +1,8 @@
+// AdminDashboard.js
 import { useState } from "react";
+import UserDetailsModal from "../components/UserDetailModal";
+import CreateRCModal from "../components/CreatercModal";
 import eyeicon from "../assets/eyeIcon.png";
-import close from "../assets/close.png";
 
 interface User {
   id: number;
@@ -13,6 +15,7 @@ interface User {
 const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const users: User[] = [
     {
@@ -24,10 +27,10 @@ const AdminDashboard = () => {
     },
     {
       id: 2,
-      name: "Amit Kumar Karwasara",
-      mobile: "8233452412",
-      password: "Amit@123",
-      wallet: 2000,
+      name: "Rahul Verma",
+      mobile: "9233452413",
+      password: "Rahul@123",
+      wallet: 3000,
     },
   ];
 
@@ -41,9 +44,19 @@ const AdminDashboard = () => {
     setIsModalOpen(false);
   };
 
+  const openCreateModal = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  const closeCreateModal = () => {
+    setIsCreateModalOpen(false);
+  };
+
   return (
     <div className="min-h-[90vh] bg-gradient-to-b from-cyan-200 to-white md:p-20 p-5">
-      <div className="my-5 md:my-0 bg-white rounded-lg shadow-lg overflow-hidden">
+      
+
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Table */}
         <div className="p-4 overflow-x-auto text-center">
           <table className="w-full border-collapse border text-center border-gray-300">
@@ -51,7 +64,9 @@ const AdminDashboard = () => {
               <tr className="bg-gray-100">
                 <th className="border border-gray-300 px-4 py-2">Sr&nbsp;No</th>
                 <th className="border border-gray-300 px-4 py-2">Name</th>
-                <th className="border border-gray-300 px-4 py-2">Mobile&nbsp;Number</th>
+                <th className="border border-gray-300 px-4 py-2">
+                  Mobile&nbsp;Number
+                </th>
                 <th className="border border-gray-300 px-4 py-2">Password</th>
                 <th className="border border-gray-300 px-4 py-2">Wallet</th>
                 <th className="border border-gray-300 px-4 py-2">Action</th>
@@ -82,7 +97,7 @@ const AdminDashboard = () => {
                     >
                       <img
                         src={eyeicon}
-                        alt="Car"
+                        alt="View"
                         className="md:w-8 md:h-8 w-6 h-6"
                       />
                     </button>
@@ -93,55 +108,22 @@ const AdminDashboard = () => {
           </table>
         </div>
       </div>
-
-      {/* Modal */}
-      {isModalOpen && selectedUser && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white gap-4 rounded-lg shadow-lg p-6 pt-0 lg:w-[40%] w-[90%]">
-            <div className="w-full flex justify-end">
-              <img
-                src={close}
-                alt="close"
-                className="w-5 h-5 my-4 cursor-pointer"
-                onClick={closeModal}
-              />
-            </div>
-
-            <div className="lg:flex">
-              {selectedUser ? (
-                <div className="w-full mb-6 lg:mb-0 text-lg flex flex-col gap-2">
-                  <p>
-                    <strong>Name</strong>: {selectedUser.name}
-                  </p>
-                  <p>
-                    <strong>Mob No.</strong>: +91-{selectedUser.mobile}
-                  </p>
-                  <p>
-                    <strong>Wallet Balance</strong>: {selectedUser.wallet} Rs
-                  </p>
-                </div>
-              ) : (
-                <p>Loading user details...</p>
-              )}
-              <div className="w-full">
-                <input
-                  type="number"
-                  placeholder="Enter amount"
-                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-                <div className="flex gap-4 mt-4">
-                  <button className="flex-1 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                    Credit
-                  </button>
-                  <button className="flex-1 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                    Debit
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="flex justify-end mt-4">
+        <button
+          onClick={openCreateModal}
+          className="py-2 px-6 bg-blue-500 text-lg font-bold text-white rounded-lg hover:bg-blue-600"
+        >
+          Create RC
+        </button>
+      </div>
+      {isModalOpen && (
+        <UserDetailsModal
+          selectedUser={selectedUser}
+          closeModal={closeModal}
+        />
       )}
+
+      {isCreateModalOpen && <CreateRCModal closeCreateModal={closeCreateModal} />}
     </div>
   );
 };

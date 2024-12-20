@@ -11,9 +11,9 @@ const Header = () => {
 
           {/* Logout button */}
           <div className="flex-1 flex justify-end">
-              <div className="px-6 py-2 bg-white text-black rounded-lg">
+              <button className="px-6 py-2 bg-white text-black rounded-lg">
                   Logout
-              </div>
+              </button>
           </div>
       </div>
   );
