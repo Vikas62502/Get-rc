@@ -1,5 +1,5 @@
 // AdminDashboard.js
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UserDetailsModal from "../components/UserDetailModal";
 import CreateRCModal from "../components/CreatercModal";
 import eyeicon from "../assets/eyeIcon.png";
@@ -16,6 +16,16 @@ const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [userData, setUserData] = useState();
+  console.log(userData, "<-- userdata");
+
+  useEffect(() => {
+    const userData = localStorage.getItem("userData");
+    console.log(userData, "<-- userdata called");
+    if (userData) {
+      setUserData(JSON.parse(userData));
+    }
+  }, []);
 
   const users: User[] = [
     {
@@ -54,7 +64,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-[90vh] bg-gradient-to-b from-cyan-200 to-white md:p-20 p-5">
-      
+
 
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Table */}

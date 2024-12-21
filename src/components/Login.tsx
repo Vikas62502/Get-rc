@@ -39,6 +39,7 @@ const Login = () => {
         emailOrPhone: identifier, // Can be email or phone
         password,
       });
+      localStorage.setItem("userData", JSON.stringify(response.data.user));
       toast.success("Login successful!")
       console.log(response, "res");
       // Handle response

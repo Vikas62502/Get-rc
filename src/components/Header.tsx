@@ -8,6 +8,7 @@ const Header = () => {
         const toastLoader = toast.loading("Logging out...");
         try {
             const response = await client.post("/api/login/user-logout");
+            localStorage.removeItem("userData");
             toast.success("Logged out successfully!");
             // navigate("/");
         } catch (error: any) {
