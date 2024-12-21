@@ -40,7 +40,7 @@ const AdminDashboard = () => {
       name: "Rahul Verma",
       mobile: "9233452413",
       password: "Rahul@123",
-      wallet: 3000,
+      wallet: 0,
     },
   ];
 
