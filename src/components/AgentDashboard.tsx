@@ -1,7 +1,12 @@
 
+import { useState } from 'react';
 import caricon from '../assets/car.png'
+import client from '../utils/axiosClient';
+import { toast } from 'sonner';
 
 const AgentDashboard = () => {
+    const [loading, setLoading] = useState(false);
+    const [vehicleNumber, setVehicleNumber] = useState("");
     const transactions = [
         { vehicle: "RJ15CA1915", date: "04/12/2024", time: "02:35 PM", amount: "-10:00 Rs" },
         { vehicle: "RJ15CA1916", date: "04/12/2024", time: "02:35 PM", amount: "-10:00 Rs" },
@@ -11,6 +16,24 @@ const AgentDashboard = () => {
         { vehicle: "Bulk RC", date: "04/12/2024", time: "02:35 PM", amount: "-460:00 Rs" },
         { vehicle: "RJ15CA1918", date: "04/12/2024", time: "02:35 PM", amount: "-00:00 Rs" },
     ];
+
+    const handleDownloadRc = async () => {
+        setLoading(true);
+        const toastLoading = toast.loading("Downloading RC...");
+        try {
+            const res = await client.post("/api/dashboard/get-single-rc", {
+                rcId: vehicleNumber
+            })
+            toast.success("RC Downloaded Successfully!");
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to download RC. Please try again.");
+        } finally {
+            toast.dismiss(toastLoading);
+            setLoading(false);
+        }
+    }
+
 
     return (
 
@@ -36,9 +59,10 @@ const AgentDashboard = () => {
                                 placeholder="Enter Vehicle Number"
                                 className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase"
                                 style={{ textTransform: "uppercase" }} // Inline style for fallback
-                                onChange={(e) => e.target.value = e.target.value.toUpperCase()} // Ensure uppercase in real-time
+                                onChange={(e) =>
+                                    setVehicleNumber(e.target.value.toUpperCase())}
                             />
-                            <button className="md:px-20 md:hidden  px-2 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600">
+                            <button className="md:px-20 md:hidden  px-2 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600" >
                                 Get&nbsp;RC
                             </button>
                         </div>
