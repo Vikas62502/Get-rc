@@ -1,7 +1,7 @@
 // AdminDashboard.js
 import { useEffect, useState } from "react";
 import UserDetailsModal from "../components/UserDetailModal";
-import CreateRCModal from "../components/CreatercModal";
+import CreateRCModal from "./CreateRCModal";
 import eyeicon from "../assets/eyeIcon.png";
 
 interface User {
