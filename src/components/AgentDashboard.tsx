@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import caricon from '../assets/car.png'
 import client from '../utils/axiosClient';
 import { toast } from 'sonner';
@@ -7,6 +7,16 @@ import { toast } from 'sonner';
 const AgentDashboard = () => {
     const [loading, setLoading] = useState(false);
     const [vehicleNumber, setVehicleNumber] = useState("");
+    const [userData, setUserData] = useState<any>();
+    console.log(userData, "<-- userdata");
+
+    useEffect(() => {
+        const userData = localStorage.getItem("userData");
+        console.log(userData, "<-- userdata called");
+        if (userData) {
+            setUserData(JSON.parse(userData));
+        }
+    }, []);
     const transactions = [
         { vehicle: "RJ15CA1915", date: "04/12/2024", time: "02:35 PM", amount: "-10:00 Rs" },
         { vehicle: "RJ15CA1916", date: "04/12/2024", time: "02:35 PM", amount: "-10:00 Rs" },
@@ -43,9 +53,9 @@ const AgentDashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:px-20 px-5 md:py-10 py-5">
                 {/* User Info */}
                 <div className="p-5 md:text-xl  md:gap-4 gap-2 flex flex-col border border-gray-500 bg-white rounded-lg shadow">
-                    <p><strong >Name</strong>: Amit Kumar</p>
-                    <p><strong>Mob No.</strong>: +91-8233452412</p>
-                    <p><strong>Wallet Balance</strong>: 4050 Rs</p>
+                    <p><strong >Name</strong>: {userData?.fullname || "NA"}</p>
+                    <p><strong>Mob No.</strong>: +91-{userData?.mobile}</p>
+                    <p><strong>Wallet Balance</strong>: {userData?.walletBalance} Rs</p>
                 </div>
 
                 {/* Get RC Section */}

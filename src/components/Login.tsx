@@ -40,6 +40,7 @@ const Login = () => {
         password,
       });
       localStorage.setItem("userData", JSON.stringify(response.data.user));
+      localStorage.setItem("token", response.data.token);
       toast.success("Login successful!")
       console.log(response, "res");
       // Handle response
@@ -50,19 +51,11 @@ const Login = () => {
           navigate("/agentdashboard");
         } else if (role === "Admin") {
           navigate("/admindashboard");
-        } else {
-          alert("Unknown role. Please contact support.");
         }
-      } else {
-        alert("Invalid credentials");
       }
     } catch (error: any) {
-      // Handle API errors
-      if (error.response && error.response.data) {
-        alert(`Error: ${error.response.data.message}`);
-      } else {
-        alert("An error occurred. Please try again.");
-      }
+      console.error(error);
+      toast.error(error?.response?.data?.message || "Invalid credentials. Please try again.")
     } finally {
       toast.dismiss(toastLoader)
       setLoading(false)

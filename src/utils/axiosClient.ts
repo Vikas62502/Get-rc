@@ -4,14 +4,19 @@ import axios from "axios";
 const client = axios.create({
   baseURL: 'http://localhost:8080',
   // timeout: 10000,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  }
 });
 
 let isRefreshing = false;
-let failedQueue : any = [];
+let failedQueue: any = [];
 
 // Function to process the failed request queue
-const processQueue = (error : any, token = null) => {
-  failedQueue.forEach((prom : any) => {
+const processQueue = (error: any, token = null) => {
+  failedQueue.forEach((prom: any) => {
     if (token) {
       prom.resolve(token);
     } else {
@@ -32,11 +37,11 @@ client.interceptors.response.use(
         // Add the request to the queue to be retried after refreshing
         return new Promise((resolve, reject) => {
           failedQueue.push({
-            resolve: (token : any) => {
+            resolve: (token: any) => {
               originalRequest.headers.Authorization = `Bearer ${token}`;
               resolve(client(originalRequest));
             },
-            reject: (err : any) => reject(err),
+            reject: (err: any) => reject(err),
           });
         });
       }
