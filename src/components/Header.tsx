@@ -1,16 +1,14 @@
-import { useNavigate } from "react-router-dom";
 import client from "../utils/axiosClient";
 import { toast } from "sonner";
 
 const Header = () => {
-    // const navigate = useNavigate();
     const handleLogout = async () => {
         const toastLoader = toast.loading("Logging out...");
         try {
-            const response = await client.post("/api/login/user-logout");
+            await client.post("/api/login/user-logout");
             localStorage.removeItem("userData");
             toast.success("Logged out successfully!");
-            // navigate("/");
+            window.location.href = "/";
         } catch (error: any) {
             if (error?.response && error?.response?.data) {
                 alert(`Error: ${error.response.data.message}`);
