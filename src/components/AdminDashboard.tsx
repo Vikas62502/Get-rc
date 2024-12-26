@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios"; // Ensure axios is installed and imported
 import UserDetailsModal from "../components/UserDetailModal";
 import CreateRCModal from "./CreateRCModal";
 import eyeicon from "../assets/eyeIcon.png";
@@ -27,7 +26,7 @@ const AdminDashboard = () => {
     setError(null);
     try {
       const response = await client.post("/api/admin/get-all-users");
-      setUsers(response.data.users); // Assuming the API returns { users: [...] }
+      setUsers(response?.data?.users);
     } catch (err) {
       console.error("Error fetching users:", err);
       setError("Failed to fetch users. Please try again.");
@@ -89,22 +88,22 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user, index) => (
+                {users?.map((user, index) => (
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
                       {index + 1}
                     </td>
                     <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
-                      {user.fullname}
+                      {user?.fullname}
                     </td>
                     <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
-                      {user.mobile}
+                      {user?.mobile}
                     </td>
                     <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
-                      {user.email || "N/A"}
+                      {user?.email || "N/A"}
                     </td>
                     <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
-                      {user.walletBalance}
+                      {user?.walletBalance}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       <button
