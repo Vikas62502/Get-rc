@@ -1,48 +1,44 @@
-// AdminDashboard.js
 import { useEffect, useState } from "react";
+import axios from "axios"; // Ensure axios is installed and imported
 import UserDetailsModal from "../components/UserDetailModal";
 import CreateRCModal from "./CreateRCModal";
 import eyeicon from "../assets/eyeIcon.png";
+import client from "../utils/axiosClient";
 
 interface User {
   id: number;
-  name: string;
+  fullname: string;
   mobile: string;
-  password: string;
-  wallet: number;
+  email?: string; // Assuming email might be nullable
+  password?: string; // Optional if not fetched
+  walletBalance: number;
 }
 
 const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [userData, setUserData] = useState();
-  console.log(userData, "<-- userdata");
+  const [users, setUsers] = useState<User[]>([]); // State for fetched users
+  const [loading, setLoading] = useState(false); // Loading state
+  const [error, setError] = useState<string | null>(null); // Error state
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await client.post("/api/admin/get-all-users");
+      setUsers(response.data.users); // Assuming the API returns { users: [...] }
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      setError("Failed to fetch users. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const userData = localStorage.getItem("userData");
-    console.log(userData, "<-- userdata called");
-    if (userData) {
-      setUserData(JSON.parse(userData));
-    }
+    fetchUsers();
   }, []);
-
-  const users: User[] = [
-    {
-      id: 1,
-      name: "Amit Kumar Karwasara",
-      mobile: "8233452412",
-      password: "Amit@123",
-      wallet: 2000,
-    },
-    {
-      id: 2,
-      name: "Rahul Verma",
-      mobile: "9233452413",
-      password: "Rahul@123",
-      wallet: 0,
-    },
-  ];
 
   const openModal = (user: User) => {
     setSelectedUser(user);
@@ -64,58 +60,69 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-[90vh] bg-gradient-to-b from-cyan-200 to-white md:p-20 p-5">
-
-
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* Table */}
         <div className="p-4 overflow-x-auto text-center">
-          <table className="w-full border-collapse border text-center border-gray-300">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 px-4 py-2">Sr&nbsp;No</th>
-                <th className="border border-gray-300 px-4 py-2">Name</th>
-                <th className="border border-gray-300 px-4 py-2">
-                  Mobile&nbsp;Number
-                </th>
-                <th className="border border-gray-300 px-4 py-2">Password</th>
-                <th className="border border-gray-300 px-4 py-2">Wallet</th>
-                <th className="border border-gray-300 px-4 py-2">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user, index) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
-                    {index + 1}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
-                    {user.name}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
-                    {user.mobile}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
-                    {user.password}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
-                    {user.wallet}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    <button
-                      onClick={() => openModal(user)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      <img
-                        src={eyeicon}
-                        alt="View"
-                        className="md:w-8 md:h-8 w-6 h-6"
-                      />
-                    </button>
-                  </td>
+          {loading ? (
+            <p>Loading...</p>
+          ) : error ? (
+            <div>
+              <p className="text-red-500">{error}</p>
+              <button
+                onClick={fetchUsers}
+                className="mt-2 py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <table className="w-full border-collapse border text-center border-gray-300">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border border-gray-300 px-4 py-2">Sr&nbsp;No</th>
+                  <th className="border border-gray-300 px-4 py-2">Name</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Mobile&nbsp;Number
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">Email</th>
+                  <th className="border border-gray-300 px-4 py-2">Wallet</th>
+                  <th className="border border-gray-300 px-4 py-2">Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.map((user, index) => (
+                  <tr key={user.id} className="hover:bg-gray-50">
+                    <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
+                      {index + 1}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
+                      {user.fullname}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
+                      {user.mobile}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
+                      {user.email || "N/A"}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2 whitespace-nowrap">
+                      {user.walletBalance}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      <button
+                        onClick={() => openModal(user)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        <img
+                          src={eyeicon}
+                          alt="View"
+                          className="md:w-8 md:h-8 w-6 h-6"
+                        />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
       <div className="flex justify-end mt-4">
@@ -132,7 +139,6 @@ const AdminDashboard = () => {
           closeModal={closeModal}
         />
       )}
-
       {isCreateModalOpen && <CreateRCModal closeCreateModal={closeCreateModal} />}
     </div>
   );

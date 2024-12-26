@@ -18,13 +18,13 @@ const UserDetailsModal = ({ selectedUser, closeModal }:any) => {
           {selectedUser ? (
             <div className="w-full mb-6 lg:mb-0 text-lg flex flex-col gap-2">
               <p>
-                <strong>Name</strong>: {selectedUser.name}
+                <strong>Name</strong>: {selectedUser.fullname}
               </p>
               <p>
                 <strong>Mob No.</strong>: +91-{selectedUser.mobile}
               </p>
               <p>
-                <strong>Wallet Balance</strong>: {selectedUser.wallet} Rs
+                <strong>Wallet Balance</strong>:Rs {selectedUser.walletBalance} 
               </p>
             </div>
           ) : (
