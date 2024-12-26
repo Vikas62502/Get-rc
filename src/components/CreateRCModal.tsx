@@ -76,7 +76,7 @@ const CreateRCModal = ({ closeCreateModal }: any) => {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white gap-4 rounded-lg shadow-lg p-6 pt-0 lg:w-[40%] w-[90%] ">
+            <div className="bg-white gap-4 rounded-lg shadow-lg p-6 pt-0 lg:w-[60%] w-[90%] ">
                 <div className="w-full flex justify-end">
                     <img
                         src={close}
@@ -86,7 +86,7 @@ const CreateRCModal = ({ closeCreateModal }: any) => {
                     />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                     {Object.keys(formData).map((key) => (
                         <input
                             key={key}
