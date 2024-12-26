@@ -5,6 +5,7 @@ import client from "../utils/axiosClient";
 import number from "../assets/phone.png";
 import pass from "../assets/padlock.png";
 import { toast } from "sonner";
+import { setLocalStorage } from "../utils/localstorage";
 
 const Login = () => {
   const [identifier, setIdentifier] = useState("");
@@ -39,10 +40,8 @@ const Login = () => {
         emailOrPhone: identifier, // Can be email or phone
         password,
       });
-      localStorage.setItem("userData", JSON.stringify(response.data.user));
-      localStorage.setItem("token", response.data.token);
+      setLocalStorage("userData", response.data.user)
       toast.success("Login successful!")
-      console.log(response, "res");
       // Handle response
       if (response.status === 200) {
         const { role } = response?.data?.user; // Assuming the API response contains a `role` field

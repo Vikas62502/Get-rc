@@ -3,47 +3,80 @@ import { useEffect, useState } from 'react';
 import caricon from '../assets/car.png'
 import client from '../utils/axiosClient';
 import { toast } from 'sonner';
+import { getDate, getTime } from '../utils/getDateTime';
 
 const AgentDashboard = () => {
     const [loading, setLoading] = useState(false);
     const [vehicleNumber, setVehicleNumber] = useState("");
     const [userData, setUserData] = useState<any>();
-    console.log(userData, "<-- userdata");
+    const [transactionsData, setTransactionsData] = useState<any[]>([]);
+
+    const fetchDashboardData = async () => {
+        setLoading(true);
+        try {
+            const res = await client.get("/api/dashboard/get-user-dashboard-data");
+            console.log(res, "<-- userdata called");
+            setUserData(res?.data?.userData);
+            setTransactionsData(res?.data?.transactions);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
-        const userData = localStorage.getItem("userData");
-        console.log(userData, "<-- userdata called");
-        if (userData) {
-            setUserData(JSON.parse(userData));
-        }
+        fetchDashboardData();
     }, []);
-    const transactions = [
-        { vehicle: "RJ15CA1915", date: "04/12/2024", time: "02:35 PM", amount: "-10:00 Rs" },
-        { vehicle: "RJ15CA1916", date: "04/12/2024", time: "02:35 PM", amount: "-10:00 Rs" },
-        { vehicle: "Bulk RC", date: "04/12/2024", time: "02:35 PM", amount: "-450:00 Rs" },
-        { vehicle: "RJ15CA1918", date: "04/12/2024", time: "02:35 PM", amount: "-00:00 Rs" },
-        { vehicle: "RJ15CA1916", date: "04/12/2024", time: "02:35 PM", amount: "-10:00 Rs" },
-        { vehicle: "Bulk RC", date: "04/12/2024", time: "02:35 PM", amount: "-460:00 Rs" },
-        { vehicle: "RJ15CA1918", date: "04/12/2024", time: "02:35 PM", amount: "-00:00 Rs" },
-    ];
 
     const handleDownloadRc = async () => {
         setLoading(true);
         const toastLoading = toast.loading("Downloading RC...");
         try {
-            const res = await client.post("/api/dashboard/get-single-rc", {
-                rcId: vehicleNumber
-            })
+            // Make the API call
+            const res = await client.post(
+                "/api/dashboard/get-single-rc",
+                { rcId: vehicleNumber },
+                { responseType: 'blob' } // Ensure we receive the response as a Blob
+            );
+
+            // Create a link to download the file
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${vehicleNumber}_RC.png`); // Name of the file
+            document.body.appendChild(link);
+            link.click(); // Trigger the download
+            link.remove(); // Remove the link element
+            window.URL.revokeObjectURL(url); // Release memory
+
+            // Notify the user of success
             toast.success("RC Downloaded Successfully!");
-        } catch (error) {
-            console.log(error);
-            toast.error("Failed to download RC. Please try again.");
+        } catch (error: any) {
+            try {
+                // If the response is a blob, parse it to get the error message
+                if (error.response?.data instanceof Blob) {
+                    const blob = error.response.data;
+                    const text = await blob.text(); // Convert blob to text
+                    const errorData = JSON.parse(text); // Parse JSON from text
+                    console.error("Parsed Error Message:", errorData.message);
+                    toast.error(`Failed to download RC: ${errorData.message}`);
+                } else {
+                    // Fallback to default error handling
+                    const errorMessage = error.response?.data?.message || "An unexpected error occurred.";
+                    console.error("Error Message:", errorMessage);
+                    toast.error(`Failed to download RC: ${errorMessage}`);
+                }
+            } catch (parsingError) {
+                console.error("Error parsing error response:", parsingError);
+                toast.error("Failed to download RC. Please try again.");
+            }
         } finally {
+            // Dismiss loading toast and reset loading state
             toast.dismiss(toastLoading);
             setLoading(false);
         }
-    }
-
+    };
 
     return (
 
@@ -55,7 +88,7 @@ const AgentDashboard = () => {
                 <div className="p-5 md:text-xl  md:gap-4 gap-2 flex flex-col border border-gray-500 bg-white rounded-lg shadow">
                     <p><strong >Name</strong>: {userData?.fullname || "NA"}</p>
                     <p><strong>Mob No.</strong>: +91-{userData?.mobile}</p>
-                    <p><strong>Wallet Balance</strong>: {userData?.walletBalance} Rs</p>
+                    <p><strong>Wallet Balance</strong>: {userData?.balance} Rs</p>
                 </div>
 
                 {/* Get RC Section */}
@@ -72,11 +105,11 @@ const AgentDashboard = () => {
                                 onChange={(e) =>
                                     setVehicleNumber(e.target.value.toUpperCase())}
                             />
-                            <button className="md:px-20 md:hidden  px-2 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600" >
+                            <button className="md:px-20 md:hidden  px-2 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
                                 Get&nbsp;RC
                             </button>
                         </div>
-                        <button className="md:px-20 px-2 hidden md:flex py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600">
+                        <button className="md:px-20 px-2 hidden md:flex py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
                             Get&nbsp;RC
                         </button>
                     </div>
@@ -100,15 +133,15 @@ const AgentDashboard = () => {
             <div className="md:px-20 px-2 md:pb-10 pb-5">
                 <h3 className="text-lg font-bold mb-4">Recent Transactions</h3>
                 <div className="border-t border-black">
-                    {transactions.map((transaction, index) => (
-                        <div key={index} className={`flex md:p-4 p-2 md:gap-5 gap-2 items-center md:text-lg text-sm my-4 border-2 rounded-xl  ${index % 2 === 0 ? "bg-gray-100" : "bg-white"} ${transaction.amount === "-00:00 Rs" ? " border-red-500" : " border-gray-500"}`}>
+                    {transactionsData.map((transaction, index) => (
+                        <div key={index} className={`flex md:p-4 p-2 md:gap-5 gap-2 items-center md:text-lg text-sm my-4 border-2 rounded-xl  ${index % 2 === 0 ? "bg-gray-100" : "bg-white"} ${transaction?.transactionType === "debit" ? " border-red-500" : " border-gray-500"}`}>
                             <img src={caricon} alt="Car" className="md:w-8 md:h-8 w-4 h-4" />
 
                             <div className="flex justify-between  items-center w-full ">
-                                <div className="md:w-28  ">{transaction.vehicle}</div>
-                                <div className="md:w-24  ">{transaction.date}</div>
-                                <div className="md:w-24 ">{transaction.time}</div>
-                                <div className="md:w-24 ">{transaction.amount}</div>
+                                <div className="md:w-28  ">{transaction?.vehicleNumber}</div>
+                                <div className="md:w-24  ">{getDate(transaction?.createdAt)}</div>
+                                <div className="md:w-24 ">{getTime(transaction?.createdAt)}</div>
+                                <div className="md:w-24 ">{transaction?.amount}</div>
                             </div>
 
                         </div>
