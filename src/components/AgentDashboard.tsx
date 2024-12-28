@@ -10,6 +10,7 @@ const AgentDashboard = () => {
     const [vehicleNumber, setVehicleNumber] = useState("");
     const [userData, setUserData] = useState<any>();
     const [transactionsData, setTransactionsData] = useState<any[]>([]);
+    const [success, setSuccess] = useState(false);
 
     const fetchDashboardData = async () => {
         setLoading(true);
@@ -27,7 +28,7 @@ const AgentDashboard = () => {
 
     useEffect(() => {
         fetchDashboardData();
-    }, []);
+    }, [success]);
 
     const handleDownloadRc = async () => {
         setLoading(true);
@@ -37,7 +38,7 @@ const AgentDashboard = () => {
             const res = await client.post(
                 "/api/dashboard/get-single-rc",
                 { rcId: vehicleNumber },
-                { responseType: 'blob' } // Ensure we receive the response as a Blob
+                { responseType: 'blob' }
             );
 
             // Create a link to download the file
@@ -49,6 +50,7 @@ const AgentDashboard = () => {
             link.click(); // Trigger the download
             link.remove(); // Remove the link element
             window.URL.revokeObjectURL(url); // Release memory
+            setSuccess(true);
 
             // Notify the user of success
             toast.success("RC Downloaded Successfully!");

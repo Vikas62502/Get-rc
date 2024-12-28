@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const client = axios.create({
-  baseURL: 'http://3.108.28.239',
+  baseURL: import.meta.env.VITE_BASE_URL as string,
   // timeout: 10000,
   withCredentials: true,
   headers: {
@@ -52,7 +52,7 @@ client.interceptors.response.use(
       try {
         // Call the refresh token API
         const refreshToken = localStorage.getItem("refreshToken");
-        const response = await axios.post(`http://localhost:8080/refresh-token`, {
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/refresh-token`, {
           refreshToken,
         });
 
