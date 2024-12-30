@@ -105,7 +105,7 @@ const AgentDashboard = () => {
                                 onChange={(e) =>
                                     setVehicleNumber(e.target.value.toUpperCase())}
                             />
-                            <button className="md:px-20 md:hidden  px-2 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
+                            <button className="md:px-20 md:hidden  px-2 py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
                                 {loading ? "Loading..." : "Get RC"}
                             </button>
                         </div>
