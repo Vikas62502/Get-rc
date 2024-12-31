@@ -37,7 +37,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [isModalOpen]);
 
   const openModal = (user: User) => {
     setSelectedUser(user);

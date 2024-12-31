@@ -11,8 +11,9 @@ const CreateRCModal = ({ closeCreateModal }: any) => {
         registrationNumber: "UP0982312",
         ownerName: "Vineet ",
         fatherName: "Sabhjaeet Yadav",
+        address: "Kalwar Road, Jhotwara, Jaipur, Rajasthan, 302012",
         ownershipType: "INDIVIDUAL",
-        chasisNumber: "Chasis Number",
+        chasisNumber: "12313212313",
         engineNumber: "Engine number",
         makerName: "Hynudia",
         modelName: "Creta",
@@ -60,6 +61,7 @@ const CreateRCModal = ({ closeCreateModal }: any) => {
             document.body.appendChild(link);
             link.click();  // Simulate a click to start the download
             link.remove(); // Clean up the link element
+            closeCreateModal(); // Close the modal
 
             // Handle success
             toast.success("Downloaded RC successfully!");
