@@ -88,7 +88,7 @@ const CreateRCModal = ({ closeCreateModal }: any) => {
                     />
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid lg:grid-cols-3 grid-cols-1 gap-4">
                     {Object.keys(formData).map((key) => (
                         <input
                             key={key}
