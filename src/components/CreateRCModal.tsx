@@ -11,6 +11,7 @@ const CreateRCModal = ({ closeCreateModal }: any) => {
         registrationNumber: "UP0982312",
         ownerName: "Vineet ",
         fatherName: "Sabhjaeet Yadav",
+        address: "Kalwar Road, Jhotwara, Jaipur, Rajasthan, 302012",
         ownershipType: "INDIVIDUAL",
         chasisNumber: "12313212313",
         engineNumber: "Engine number",
