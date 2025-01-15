@@ -3,19 +3,17 @@ import axios from "axios";
 
 const client = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL as string,
-  // timeout: 10000,
-  withCredentials: true,
+  withCredentials: true, // Automatically includes HttpOnly cookies
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  }
+    Authorization: `Bearer ${localStorage.getItem("cbpl-token")}`,
+  },
 });
 
 let isRefreshing = false;
 let failedQueue: any = [];
 
-// Function to process the failed request queue
-const processQueue = (error: any, token = null) => {
+const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom: any) => {
     if (token) {
       prom.resolve(token);
@@ -23,7 +21,6 @@ const processQueue = (error: any, token = null) => {
       prom.reject(error);
     }
   });
-
   failedQueue = [];
 };
 
@@ -32,12 +29,11 @@ client.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    if (error.response && error.response.status === 403 && !originalRequest._retry) {
       if (isRefreshing) {
-        // Add the request to the queue to be retried after refreshing
         return new Promise((resolve, reject) => {
           failedQueue.push({
-            resolve: (token: any) => {
+            resolve: (token: string) => {
               originalRequest.headers.Authorization = `Bearer ${token}`;
               resolve(client(originalRequest));
             },
@@ -50,33 +46,32 @@ client.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Call the refresh token API
-        const refreshToken = localStorage.getItem("refreshToken");
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/refresh-token`, {
-          refreshToken,
-        });
+        // Refresh the token using HttpOnly cookie
+        const refreshResponse = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}/api/login/refresh-token`,
+          {},
+          {
+            withCredentials: true
+          }
+        );
 
-        const newAccessToken = response.data.token;
+        const newAccessToken = refreshResponse.data.token;
 
-        // Save the new access token in local storage
-        localStorage.setItem("cbpl-token", newAccessToken);
+        if (newAccessToken) {
+          // Save the new token
+          localStorage.setItem("cbpl-token", newAccessToken);
+          document.cookie = `cbpl-token=${newAccessToken}; path=/; max-age=86400;`;
 
-        document.cookie = `cbpl-token=${response.data.token}; path=/; max-age=86400;`;
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          processQueue(null, newAccessToken);
 
-        // Retry the original request with the new token
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-
-        // Process all queued requests
-        processQueue(null, newAccessToken);
-
-        return client(originalRequest);
+          return client(originalRequest);
+        }
       } catch (refreshError) {
-        // Handle refresh token failure (e.g., logout user)
-        console.error("Refresh token failed", refreshError);
+        console.error("Token refresh failed:", refreshError);
         processQueue(refreshError, null);
         localStorage.removeItem("cbpl-token");
-        localStorage.removeItem("refreshToken");
-        window.location.href = "/login"; // Redirect to login
+        window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

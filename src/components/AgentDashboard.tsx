@@ -16,7 +16,6 @@ const AgentDashboard = () => {
         setLoading(true);
         try {
             const res = await client.get("/api/dashboard/get-user-dashboard-data");
-            console.log(res, "<-- userdata called");
             setUserData(res?.data?.userData);
             setTransactionsData(res?.data?.transactions);
         } catch (error) {
