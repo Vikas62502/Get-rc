@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const client = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL as string,
+  baseURL: '/',
   withCredentials: true, // Automatically includes HttpOnly cookies
   headers: {
     "Content-Type": "application/json",
@@ -48,7 +48,8 @@ client.interceptors.response.use(
       try {
         // Refresh the token using HttpOnly cookie
         const refreshResponse = await axios.post(
-          `${import.meta.env.VITE_BASE_URL}/api/login/refresh-token`,
+          // `${import.meta.env.VITE_BASE_URL}/api/login/refresh-token`,
+          `/api/login/refresh-token`,
           {},
           {
             withCredentials: true
