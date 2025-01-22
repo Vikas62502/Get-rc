@@ -23,7 +23,6 @@ const AgentDashboard = () => {
         setLoading(true);
         try {
             const res = await client.get("/api/dashboard/get-user-dashboard-data");
-            console.log(res, "<-- userdata called");
             setUserData(res?.data?.userData);
             setTransactionsData(res?.data?.transactions);
         } catch (error) {
@@ -187,12 +186,12 @@ const AgentDashboard = () => {
                                 onChange={(e) =>
                                     setVehicleNumber(e.target.value.toUpperCase())}
                             />
-                            <button className="md:px-10 md:hidden  px-2 py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
-                                {loading ? "Loading..." : "Get RC"}
+                            <button className="md:px-20 md:hidden  px-2 py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
+                                {loading ? "Loading..." : `Get\u00A0RC`}
                             </button>
                         </div>
-                        <button className="md:px-20 px-2 hidden md:flex py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
-                            {loading ? "Loading..." : "Get RC"}
+                        <button className="md:px-20 px-2 hidden md:flex py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
+                            {loading ? "Loading..." : `Get\u00A0RC`}
                         </button>
                     </div>
 
