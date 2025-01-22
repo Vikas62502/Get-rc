@@ -5,6 +5,7 @@ import client from "../utils/axiosClient";
 import number from "../assets/phone.png";
 import pass from "../assets/padlock.png";
 import { toast } from "sonner";
+import LoginandSignupHeader from './LoginandSignupHeader';
 import { setLocalStorage } from "../utils/localstorage";
 
 const Login = () => {
@@ -62,6 +63,9 @@ const Login = () => {
   };
 
   return (
+    <>
+      <LoginandSignupHeader />
+
     <div className="flex items-center justify-center min-h-[90vh] bg-gradient-to-b from-cyan-200 to-white">
       <div className="w-96 p-6 mx-5 lg:mx-0 bg-white rounded-lg shadow-lg">
         <h3 className="text-center text-lg font-semibold mb-4">Log in</h3>
@@ -105,6 +109,7 @@ const Login = () => {
         </p>
       </div>
     </div>
+    </>
   );
 };
 

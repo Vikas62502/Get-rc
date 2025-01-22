@@ -46,28 +46,19 @@ client.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Refresh the token using HttpOnly cookie
-        const refreshResponse = await axios.post(
-          // `${import.meta.env.VITE_BASE_URL}/api/login/refresh-token`,
-          `/api/login/refresh-token`,
-          {},
-          {
-            withCredentials: true
-          }
-        );
+        // Call the refresh token API
+        const response = await client.post(`api/login/refresh-token`);
+        const newAccessToken = response.data.token;
 
-        const newAccessToken = refreshResponse.data.token;
+        document.cookie = `cbpl-token=${response.data.token}; path=/; max-age=86400;`;
 
-        if (newAccessToken) {
-          // Save the new token
-          localStorage.setItem("cbpl-token", newAccessToken);
-          document.cookie = `cbpl-token=${newAccessToken}; path=/; max-age=86400;`;
+        // Retry the original request with the new token
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-          processQueue(null, newAccessToken);
+        // Process all queued requests
+        processQueue(null, newAccessToken);
 
-          return client(originalRequest);
-        }
+        return client(originalRequest);
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
         processQueue(refreshError, null);
