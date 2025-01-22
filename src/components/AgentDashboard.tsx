@@ -13,18 +13,17 @@ const AgentDashboard = () => {
     const [userData, setUserData] = useState<any>();
     const [transactionsData, setTransactionsData] = useState<any[]>([]);
     const [success, setSuccess] = useState<boolean | null>(null);
-    console.log(success, "<-- success")
-
-    const [currentPage, setCurrentPage] = useState(1);  // Pagination state
-    const itemsPerPage = 6;  // Number of transactions per page
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalTransactions, setTotalTransactions] = useState(0);
+    console.log(totalTransactions, "<-- total transaction")
+    const itemsPerPage = 5;
+    console.log(totalTransactions / itemsPerPage, "<-- asdsad")
 
     const fetchDashboardData = async () => {
-        console.log("user data api called <<<<<<<<---------------------->>>>>>>>>")
         setLoading(true);
         try {
             const res = await client.get("/api/dashboard/get-user-dashboard-data");
             setUserData(res?.data?.userData);
-            setTransactionsData(res?.data?.transactions);
         } catch (error) {
             console.log(error);
         } finally {
@@ -157,12 +156,30 @@ const AgentDashboard = () => {
         }
     };
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedTransactions = transactionsData.slice(startIndex, startIndex + itemsPerPage);
+    const fetchTransactions = async (page: number) => {
+        setLoading(true);
+        try {
+            const res = await client.get(`/api/dashboard/get-transaction?page=${page}&limit=${itemsPerPage}`);
+            console.log(res, "<--- res")
+            setTransactionsData(res?.data?.transactions || []);
+            setTotalTransactions(res?.data?.pagination?.totalTransactions)
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to fetch transactions.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchTransactions(currentPage)
+    }, [currentPage])
+
+
     return (
 
         <div className="  bg-gradient-to-b  min-h-[90vh] from-cyan-200 to-white ">
-<Header/>
+            <Header />
             {/* User Info and Input Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:px-20 px-5 md:py-10 py-5">
                 {/* User Info */}
@@ -223,7 +240,7 @@ const AgentDashboard = () => {
             <div className="md:px-20 px-2 md:pb-10 pb-5">
                 <h3 className="text-lg font-bold mb-4">Recent Transactions</h3>
                 <div className="border-t border-black">
-                    {paginatedTransactions.map((transaction, index) => (
+                    {transactionsData.map((transaction, index) => (
                         <div
                             key={index}
                             className={`flex md:p-4 p-2 md:gap-5 gap-2 items-center md:text-lg text-sm my-4 border-2 rounded-xl ${index % 2 === 0 ? "bg-gray-100" : "bg-white"} ${transaction?.transactionType === "debit" ? "border-red-500" : "border-gray-500"}`}
@@ -239,7 +256,7 @@ const AgentDashboard = () => {
                     ))}
                 </div>
                 <Pagination
-                    totalPages={Math.ceil(transactionsData.length / itemsPerPage)}
+                    totalPages={Math.ceil(totalTransactions / itemsPerPage)}
                     setCurrentPage={setCurrentPage}
                     currentPage={currentPage}
                 />
