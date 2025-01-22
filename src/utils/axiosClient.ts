@@ -2,9 +2,8 @@
 import axios from "axios";
 
 const client = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL as string,
-  // timeout: 10000,
-  withCredentials: true,
+  baseURL: 'http://localhost:8080/',
+  withCredentials: true, // Automatically includes HttpOnly cookies
   headers: {
     "Content-Type": "application/json",
     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -32,7 +31,7 @@ client.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    if (error.response && error.response.status === 403 && !originalRequest._retry) {
       if (isRefreshing) {
         // Add the request to the queue to be retried after refreshing
         return new Promise((resolve, reject) => {
@@ -51,15 +50,8 @@ client.interceptors.response.use(
 
       try {
         // Call the refresh token API
-        const refreshToken = localStorage.getItem("refreshToken");
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/refresh-token`, {
-          refreshToken,
-        });
-
+        const response = await client.post(`api/login/refresh-token`);
         const newAccessToken = response.data.token;
-
-        // Save the new access token in local storage
-        localStorage.setItem("cbpl-token", newAccessToken);
 
         document.cookie = `cbpl-token=${response.data.token}; path=/; max-age=86400;`;
 
