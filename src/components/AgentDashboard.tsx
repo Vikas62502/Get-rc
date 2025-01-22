@@ -80,6 +80,57 @@ const AgentDashboard = () => {
         }
     };
 
+    const handleDownloadBulkRc = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        setLoading(true);
+        const toastLoading = toast.loading("Uploading CSV and Downloading Bulk RC...");
+        try {
+            if (!e.target.files || e.target.files.length === 0) {
+                toast.error("Please select a CSV file.");
+                return;
+            }
+            const file = e?.target?.files[0];
+            if (!file) {
+                toast.error("Please select a CSV file.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // Make the API call
+            const res = await client.post(
+                "/api/dashboard/get-bulk-rc",
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                    responseType: "blob",
+                }
+            );
+
+            // Create a link to download the ZIP file
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `Bulk_RCs_${Date.now()}.zip`);
+            document.body.appendChild(link);
+            link.click(); // Trigger download
+            link.remove(); // Cleanup
+            window.URL.revokeObjectURL(url); // Release memory
+
+            // Notify success
+            toast.success("Bulk RC Downloaded Successfully!");
+        } catch (error) {
+            console.error("Error downloading bulk RC:", error);
+            toast.error("Failed to download Bulk RC. Please try again.");
+        } finally {
+            toast.dismiss(toastLoading);
+            setLoading(false);
+        }
+    };
+
+
     return (
 
         <div className="  bg-gradient-to-b  min-h-[90vh] from-cyan-200 to-white ">
@@ -120,12 +171,21 @@ const AgentDashboard = () => {
                     <div className="flex md:gap-4 gap-2 mt-3 items-center text-sm justify-end w-full">
                         <h3 className="mg:text-xl text-sm font-bold ">For&nbsp;Bulk&nbsp;RC</h3>
 
-                        <button className="bg-purple-500 text-white py-2 md:px-10 px-3 rounded hover:bg-purple-600">
+                        <a className="bg-purple-500 text-white py-2 md:px-10 px-3 rounded hover:bg-purple-600" href='/modifiedSample Vrn.csv' download={true}>
                             Sample&nbsp;CSV
-                        </button>
-                        <button className="bg-green-500 text-white py-2 md:px-10 px-3 rounded hover:bg-green-600">
+                        </a>
+                        <label
+                            htmlFor='downloadBulkRcInput'
+                            className="bg-green-500 text-white py-2 md:px-10 px-3 rounded hover:bg-green-600 cursor-pointer">
                             Upload&nbsp;CSV
-                        </button>
+                        </label>
+                        <input
+                            type="file"
+                            accept=".csv"
+                            className='hidden'
+                            id='downloadBulkRcInput'
+                            onChange={handleDownloadBulkRc}
+                        />
 
                     </div>
                 </div>

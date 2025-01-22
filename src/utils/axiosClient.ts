@@ -2,9 +2,8 @@
 import axios from "axios";
 
 const client = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL as string,
-  // timeout: 10000,
-  withCredentials: true,
+  baseURL: 'http://localhost:8080/',
+  withCredentials: true, // Automatically includes HttpOnly cookies
   headers: {
     "Content-Type": "application/json",
     Authorization: `Bearer ${localStorage.getItem("token")}`,
