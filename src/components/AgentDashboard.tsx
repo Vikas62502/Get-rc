@@ -1,9 +1,11 @@
 
 import { useEffect, useState } from 'react';
 import caricon from '../assets/car.png'
+import Pagination from './Pagination';
 import client from '../utils/axiosClient';
 import { toast } from 'sonner';
 import { getDate, getTime } from '../utils/getDateTime';
+import Header from './Header';
 
 const AgentDashboard = () => {
     const [loading, setLoading] = useState(false);
@@ -11,6 +13,9 @@ const AgentDashboard = () => {
     const [userData, setUserData] = useState<any>();
     const [transactionsData, setTransactionsData] = useState<any[]>([]);
     const [success, setSuccess] = useState(false);
+
+    const [currentPage, setCurrentPage] = useState(1);  // Pagination state
+    const itemsPerPage = 6;  // Number of transactions per page
 
     const fetchDashboardData = async () => {
         setLoading(true);
@@ -130,11 +135,12 @@ const AgentDashboard = () => {
         }
     };
 
-
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedTransactions = transactionsData.slice(startIndex, startIndex + itemsPerPage);
     return (
 
         <div className="  bg-gradient-to-b  min-h-[90vh] from-cyan-200 to-white ">
-
+<Header/>
             {/* User Info and Input Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:px-20 px-5 md:py-10 py-5">
                 {/* User Info */}
@@ -158,11 +164,11 @@ const AgentDashboard = () => {
                                 onChange={(e) =>
                                     setVehicleNumber(e.target.value.toUpperCase())}
                             />
-                            <button className="md:px-20 md:hidden  px-2 py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
+                            <button className="md:px-10 md:hidden  px-2 py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
                                 {loading ? "Loading..." : "Get RC"}
                             </button>
                         </div>
-                        <button className="md:px-20 px-2 hidden md:flex py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
+                        <button className="md:px-20 px-2 hidden md:flex py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
                             {loading ? "Loading..." : "Get RC"}
                         </button>
                     </div>
@@ -171,12 +177,12 @@ const AgentDashboard = () => {
                     <div className="flex md:gap-4 gap-2 mt-3 items-center text-sm justify-end w-full">
                         <h3 className="mg:text-xl text-sm font-bold ">For&nbsp;Bulk&nbsp;RC</h3>
 
-                        <a className="bg-purple-500 text-white py-2 md:px-10 px-3 rounded hover:bg-purple-600" href='/modifiedSample Vrn.csv' download={true}>
+                        <a className="bg-purple-500 text-white py-2 md:px-10 px-3 rounded font-semibold hover:bg-purple-600" href='/modifiedSample Vrn.csv' download={true}>
                             Sample&nbsp;CSV
                         </a>
                         <label
                             htmlFor='downloadBulkRcInput'
-                            className="bg-green-500 text-white py-2 md:px-10 px-3 rounded hover:bg-green-600 cursor-pointer">
+                            className="bg-green-500 text-white py-2 md:px-10 px-3 font-semibold rounded hover:bg-green-600 cursor-pointer">
                             Upload&nbsp;CSV
                         </label>
                         <input
@@ -195,20 +201,26 @@ const AgentDashboard = () => {
             <div className="md:px-20 px-2 md:pb-10 pb-5">
                 <h3 className="text-lg font-bold mb-4">Recent Transactions</h3>
                 <div className="border-t border-black">
-                    {transactionsData.map((transaction, index) => (
-                        <div key={index} className={`flex md:p-4 p-2 md:gap-5 gap-2 items-center md:text-lg text-sm my-4 border-2 rounded-xl  ${index % 2 === 0 ? "bg-gray-100" : "bg-white"} ${transaction?.transactionType === "debit" ? " border-red-500" : " border-gray-500"}`}>
+                    {paginatedTransactions.map((transaction, index) => (
+                        <div
+                            key={index}
+                            className={`flex md:p-4 p-2 md:gap-5 gap-2 items-center md:text-lg text-sm my-4 border-2 rounded-xl ${index % 2 === 0 ? "bg-gray-100" : "bg-white"} ${transaction?.transactionType === "debit" ? "border-red-500" : "border-gray-500"}`}
+                        >
                             <img src={caricon} alt="Car" className="md:w-8 md:h-8 w-4 h-4" />
-
-                            <div className="flex justify-between  items-center w-full ">
-                                <div className="md:w-28  ">{transaction?.vehicleNumber}</div>
-                                <div className="md:w-24  ">{getDate(transaction?.createdAt)}</div>
-                                <div className="md:w-24 ">{getTime(transaction?.createdAt)}</div>
-                                <div className="md:w-24 ">{transaction?.amount}</div>
+                            <div className="flex justify-between items-center w-full">
+                                <div className="md:w-28">{transaction?.vehicleNumber}</div>
+                                <div className="md:w-24">{getDate(transaction?.createdAt)}</div>
+                                <div className="md:w-24">{getTime(transaction?.createdAt)}</div>
+                                <div className="md:w-24">{transaction?.amount}</div>
                             </div>
-
                         </div>
                     ))}
                 </div>
+                <Pagination
+                    totalPages={Math.ceil(transactionsData.length / itemsPerPage)}
+                    setCurrentPage={setCurrentPage}
+                    currentPage={currentPage}
+                />
             </div>
         </div>
 
