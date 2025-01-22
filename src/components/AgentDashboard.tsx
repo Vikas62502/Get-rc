@@ -12,12 +12,14 @@ const AgentDashboard = () => {
     const [vehicleNumber, setVehicleNumber] = useState("");
     const [userData, setUserData] = useState<any>();
     const [transactionsData, setTransactionsData] = useState<any[]>([]);
-    const [success, setSuccess] = useState(false);
+    const [success, setSuccess] = useState<boolean | null>(null);
+    console.log(success, "<-- success")
 
     const [currentPage, setCurrentPage] = useState(1);  // Pagination state
     const itemsPerPage = 6;  // Number of transactions per page
 
     const fetchDashboardData = async () => {
+        console.log("user data api called <<<<<<<<---------------------->>>>>>>>>")
         setLoading(true);
         try {
             const res = await client.get("/api/dashboard/get-user-dashboard-data");
@@ -36,6 +38,7 @@ const AgentDashboard = () => {
     }, [success]);
 
     const handleDownloadRc = async () => {
+        setSuccess(false)
         setLoading(true);
         const toastLoading = toast.loading("Downloading RC...");
         try {
@@ -82,6 +85,7 @@ const AgentDashboard = () => {
             // Dismiss loading toast and reset loading state
             toast.dismiss(toastLoading);
             setLoading(false);
+            setSuccess(false)
         }
     };
 
@@ -113,6 +117,7 @@ const AgentDashboard = () => {
                     responseType: "blob",
                 }
             );
+            setSuccess(true)
 
             // Create a link to download the ZIP file
             const url = window.URL.createObjectURL(new Blob([res.data]));
@@ -122,16 +127,34 @@ const AgentDashboard = () => {
             document.body.appendChild(link);
             link.click(); // Trigger download
             link.remove(); // Cleanup
-            window.URL.revokeObjectURL(url); // Release memory
+            window.URL.revokeObjectURL(url);
 
             // Notify success
             toast.success("Bulk RC Downloaded Successfully!");
-        } catch (error) {
-            console.error("Error downloading bulk RC:", error);
-            toast.error("Failed to download Bulk RC. Please try again.");
+        } catch (error: any) {
+            try {
+                // If the response is a blob, parse it to get the error message
+                if (error.response?.data instanceof Blob) {
+                    const blob = error.response.data;
+                    const text = await blob.text();
+                    const errorData = JSON.parse(text);
+                    console.error("Parsed Error Message:", errorData.message);
+                    toast.error(`Failed to download RC: ${errorData.message}`);
+                } else {
+                    // Fallback to default error handling
+                    const errorMessage = error.response?.data?.message || "An unexpected error occurred.";
+                    console.error("Error Message:", errorMessage);
+                    toast.error(`Failed to download RC: ${errorMessage}`);
+                }
+            } catch (parsingError) {
+                console.error("Error parsing error response:", parsingError);
+                toast.error("Failed to download RC. Please try again.");
+            }
         } finally {
             toast.dismiss(toastLoading);
             setLoading(false);
+            setSuccess(null)
+            fetchDashboardData()
         }
     };
 
