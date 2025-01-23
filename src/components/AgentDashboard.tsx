@@ -16,7 +16,7 @@ const AgentDashboard = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalTransactions, setTotalTransactions] = useState(0);
     console.log(totalTransactions, "<-- total transaction")
-    const itemsPerPage = 5;
+    const itemsPerPage = 10;
     console.log(totalTransactions / itemsPerPage, "<-- asdsad")
 
     const fetchDashboardData = async () => {
@@ -159,7 +159,7 @@ const AgentDashboard = () => {
     const fetchTransactions = async (page: number) => {
         setLoading(true);
         try {
-            const res = await client.get(`/api/dashboard/get-transaction?page=${page}&limit=${itemsPerPage}`);
+            const res = await client.get(`/api/dashboard/get-transaction?pageNo=${page}&pageSize=${itemsPerPage}`);
             console.log(res, "<--- res")
             setTransactionsData(res?.data?.transactions || []);
             setTotalTransactions(res?.data?.pagination?.totalTransactions)
