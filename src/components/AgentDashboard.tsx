@@ -13,17 +13,15 @@ const AgentDashboard = () => {
     const [userData, setUserData] = useState<any>();
     const [transactionsData, setTransactionsData] = useState<any[]>([]);
     const [success, setSuccess] = useState<boolean | null>(null);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalTransactions, setTotalTransactions] = useState(0);
-    console.log(totalTransactions, "<-- total transaction")
-    const itemsPerPage = 10;
-    console.log(totalTransactions / itemsPerPage, "<-- asdsad")
+    const [currentPage, setCurrentPage] = useState(1);  // Pagination state
+    const itemsPerPage = 10;  // Number of transactions per page
 
     const fetchDashboardData = async () => {
         setLoading(true);
         try {
             const res = await client.get("/api/dashboard/get-user-dashboard-data");
             setUserData(res?.data?.userData);
+            setTransactionsData(res?.data?.transactions);
         } catch (error) {
             console.log(error);
         } finally {
@@ -84,6 +82,7 @@ const AgentDashboard = () => {
             toast.dismiss(toastLoading);
             setLoading(false);
             setSuccess(false)
+            await fetchDashboardData()
         }
     };
 
@@ -107,13 +106,12 @@ const AgentDashboard = () => {
             // Make the API call
             const res = await client.post(
                 "/api/dashboard/get-bulk-rc",
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                    responseType: "blob",
-                }
+                formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                responseType: "blob",
+            }
             );
             setSuccess(true)
 
@@ -129,6 +127,7 @@ const AgentDashboard = () => {
 
             // Notify success
             toast.success("Bulk RC Downloaded Successfully!");
+            await fetchDashboardData()
         } catch (error: any) {
             try {
                 // If the response is a blob, parse it to get the error message
@@ -152,30 +151,11 @@ const AgentDashboard = () => {
             toast.dismiss(toastLoading);
             setLoading(false);
             setSuccess(null)
-            fetchDashboardData()
         }
     };
 
-    const fetchTransactions = async (page: number) => {
-        setLoading(true);
-        try {
-            const res = await client.get(`/api/dashboard/get-transaction?pageNo=${page}&pageSize=${itemsPerPage}`);
-            console.log(res, "<--- res")
-            setTransactionsData(res?.data?.transactions || []);
-            setTotalTransactions(res?.data?.pagination?.totalTransactions)
-        } catch (error) {
-            console.log(error);
-            toast.error("Failed to fetch transactions.");
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    useEffect(() => {
-        fetchTransactions(currentPage)
-    }, [currentPage])
-
-
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedTransactions = transactionsData.slice(startIndex, startIndex + itemsPerPage);
     return (
 
         <div className="  bg-gradient-to-b  min-h-[90vh] from-cyan-200 to-white ">
@@ -203,12 +183,12 @@ const AgentDashboard = () => {
                                 onChange={(e) =>
                                     setVehicleNumber(e.target.value.toUpperCase())}
                             />
-                            <button className="md:px-20 md:hidden  px-2 py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
-                                {loading ? "Loading..." : `Get\u00A0RC`}
+                            <button className="md:px-10 md:hidden  px-2 py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
+                                {loading ? "Loading..." : "Get RC"}
                             </button>
                         </div>
-                        <button className="md:px-20 px-2 hidden md:flex py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
-                            {loading ? "Loading..." : `Get\u00A0RC`}
+                        <button className="md:px-20 px-2 hidden md:flex py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600" onClick={handleDownloadRc}>
+                            {loading ? "Loading..." : "Get RC"}
                         </button>
                     </div>
 
@@ -240,7 +220,7 @@ const AgentDashboard = () => {
             <div className="md:px-20 px-2 md:pb-10 pb-5">
                 <h3 className="text-lg font-bold mb-4">Recent Transactions</h3>
                 <div className="border-t border-black">
-                    {transactionsData.map((transaction, index) => (
+                    {paginatedTransactions.map((transaction, index) => (
                         <div
                             key={index}
                             className={`flex md:p-4 p-2 md:gap-5 gap-2 items-center md:text-lg text-sm my-4 border-2 rounded-xl ${index % 2 === 0 ? "bg-gray-100" : "bg-white"} ${transaction?.transactionType === "debit" ? "border-red-500" : "border-gray-500"}`}
@@ -256,7 +236,7 @@ const AgentDashboard = () => {
                     ))}
                 </div>
                 <Pagination
-                    totalPages={Math.ceil(totalTransactions / itemsPerPage)}
+                    totalPages={Math.ceil(transactionsData.length / itemsPerPage)}
                     setCurrentPage={setCurrentPage}
                     currentPage={currentPage}
                 />
