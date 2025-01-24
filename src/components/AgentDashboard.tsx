@@ -13,8 +13,6 @@ const AgentDashboard = () => {
     const [userData, setUserData] = useState<any>();
     const [transactionsData, setTransactionsData] = useState<any[]>([]);
     const [success, setSuccess] = useState<boolean | null>(null);
-    console.log(success, "<-- success")
-
     const [currentPage, setCurrentPage] = useState(1);  // Pagination state
     const itemsPerPage = 6;  // Number of transactions per page
 
@@ -86,6 +84,7 @@ const AgentDashboard = () => {
             toast.dismiss(toastLoading);
             setLoading(false);
             setSuccess(false)
+            await fetchDashboardData()
         }
     };
 
@@ -109,8 +108,7 @@ const AgentDashboard = () => {
             // Make the API call
             const res = await client.post(
                 "/api/dashboard/get-bulk-rc",
-                formData,
-                {
+                formData,{
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
@@ -131,6 +129,7 @@ const AgentDashboard = () => {
 
             // Notify success
             toast.success("Bulk RC Downloaded Successfully!");
+            await fetchDashboardData()
         } catch (error: any) {
             try {
                 // If the response is a blob, parse it to get the error message
@@ -154,7 +153,6 @@ const AgentDashboard = () => {
             toast.dismiss(toastLoading);
             setLoading(false);
             setSuccess(null)
-            fetchDashboardData()
         }
     };
 
@@ -163,7 +161,7 @@ const AgentDashboard = () => {
     return (
 
         <div className="  bg-gradient-to-b  min-h-[90vh] from-cyan-200 to-white ">
-<Header/>
+            <Header />
             {/* User Info and Input Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:px-20 px-5 md:py-10 py-5">
                 {/* User Info */}
