@@ -150,7 +150,6 @@ const AgentDashboard = () => {
                             </button>
                         </div>
 
-
                         <div className="flex md:gap-4 gap-2 mt-3 items-center text-sm justify-end w-full">
                             <h3 className="mg:text-xl text-sm font-bold ">For&nbsp;Bulk&nbsp;RC</h3>
 

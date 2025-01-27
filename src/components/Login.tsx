@@ -101,7 +101,12 @@ const Login = () => {
             {loading ? "Loading..." : "Log in"}
           </button>
         </form>
-        <p className="text-center text-sm mt-4">
+        <p className="text-right w-full  text-sm mt-4">
+          <Link to="/forgotpassword" className="text-blue-500 font-semibold">
+            Forgot Password?
+          </Link>
+        </p>
+        <p className="text-center text-lg mt-4">
           Not a member?{" "}
           <Link to="/signup" className="text-blue-500 font-semibold">
             Sign Up Now
