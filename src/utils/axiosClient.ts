@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const client = axios.create({
-  baseURL: '/',
+  baseURL: 'http://localhost:8080',
   withCredentials: true, // Automatically includes HttpOnly cookies
   headers: {
     "Content-Type": "application/json",
