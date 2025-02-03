@@ -8,8 +8,8 @@ interface User {
   id: number;
   fullname: string;
   mobile: string;
-  email?: string; // Assuming email might be nullable
-  password?: string; // Optional if not fetched
+  email?: string;
+  password?: string;
   walletBalance: number;
 }
 
@@ -17,9 +17,9 @@ const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [users, setUsers] = useState<User[]>([]); // State for fetched users
-  const [loading, setLoading] = useState(false); // Loading state
-  const [error, setError] = useState<string | null>(null); // Error state
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -36,7 +36,9 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
+    if (!isModalOpen) {
+      fetchUsers();
+    }
   }, [isModalOpen]);
 
   const openModal = (user: User) => {
@@ -61,6 +63,25 @@ const AdminDashboard = () => {
     <div className="min-h-[90vh] bg-gradient-to-b from-cyan-200 to-white md:p-20 p-5">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="p-4 overflow-x-auto text-center">
+          {/* 🆕 Top Section with Buttons */}
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">User List</h2>
+            <div className="flex gap-4">
+              <button
+                onClick={fetchUsers}
+                className="py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600"
+              >
+                🔄 Refresh
+              </button>
+              <button
+                onClick={openCreateModal}
+                className="py-2 px-6 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                ➕ Create RC
+              </button>
+            </div>
+          </div>
+
           {loading ? (
             <p>Loading...</p>
           ) : error ? (
@@ -79,9 +100,7 @@ const AdminDashboard = () => {
                 <tr className="bg-gray-100">
                   <th className="border border-gray-300 px-4 py-2">Sr&nbsp;No</th>
                   <th className="border border-gray-300 px-4 py-2">Name</th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Mobile&nbsp;Number
-                  </th>
+                  <th className="border border-gray-300 px-4 py-2">Mobile&nbsp;Number</th>
                   <th className="border border-gray-300 px-4 py-2">Email</th>
                   <th className="border border-gray-300 px-4 py-2">Wallet</th>
                   <th className="border border-gray-300 px-4 py-2">Action</th>
@@ -124,19 +143,9 @@ const AdminDashboard = () => {
           )}
         </div>
       </div>
-      <div className="flex justify-end mt-4">
-        <button
-          onClick={openCreateModal}
-          className="py-2 px-6 bg-blue-500 text-lg font-bold text-white rounded-lg hover:bg-blue-600"
-        >
-          Create RC
-        </button>
-      </div>
+
       {isModalOpen && (
-        <UserDetailsModal
-          selectedUser={selectedUser}
-          closeModal={closeModal}
-        />
+        <UserDetailsModal selectedUser={selectedUser} closeModal={closeModal} />
       )}
       {isCreateModalOpen && <CreateRCModal closeCreateModal={closeCreateModal} />}
     </div>

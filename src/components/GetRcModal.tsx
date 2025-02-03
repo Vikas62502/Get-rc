@@ -25,7 +25,7 @@ const GetRcModal: React.FC<propInterface> = ({ setIsModalOpen, vehicleNumber, se
             const url = window.URL.createObjectURL(new Blob([res.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `${vehicleNumber}${rcType === 'digital' ? '_RC.pdf' : '_RC.png'}`);
+            link.setAttribute('download', `${vehicleNumber}${'_RC.png'}`);
             document.body.appendChild(link);
             link.click();
             link.remove();
