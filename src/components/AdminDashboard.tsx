@@ -51,9 +51,9 @@ const AdminDashboard = () => {
     setIsModalOpen(false);
   };
 
-  const openCreateModal = () => {
-    setIsCreateModalOpen(true);
-  };
+  // const openCreateModal = () => {
+  //   setIsCreateModalOpen(true);
+  // };
 
   const closeCreateModal = () => {
     setIsCreateModalOpen(false);
