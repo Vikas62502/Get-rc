@@ -15,6 +15,8 @@ const AgentDashboard = () => {
     const [userData, setUserData] = useState<any>();
     const [transactionsData, setTransactionsData] = useState<any[]>([]);
     const [success, setSuccess] = useState<boolean | null>(null);
+    const [typeOfRc, setTypeOfRc] = useState<string>("normal");
+
     const [currentPage, setCurrentPage] = useState(1);  // Pagination state
     const itemsPerPage = 10;  // Number of transactions per page
 
@@ -51,6 +53,7 @@ const AgentDashboard = () => {
 
             const formData = new FormData();
             formData.append("file", file);
+            formData.append("typeOfRc", typeOfRc);
 
             // Make the API call
             const res = await client.post(
@@ -130,46 +133,90 @@ const AgentDashboard = () => {
 
                     <div className="md:p-6 p-2 bg-white border border-gray-500 rounded-lg shadow flex flex-col gap-2 items-center">
                         <div className="flex w-full gap-3">
-                            <img src={caricon} alt="Car" className="w-10 h-10 " />
-                            <div className=" flex flex-col w-full justify-end gap-5">
+                            <img src={caricon} alt="Car" className="w-10 h-10" />
+                            <div className="flex flex-col w-full justify-end gap-5">
                                 <input
                                     type="text"
                                     placeholder="Enter Vehicle Number"
                                     className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:outline-none uppercase"
                                     style={{ textTransform: "uppercase" }} // Inline style for fallback
-                                    onChange={(e) =>
-                                        setVehicleNumber(e.target.value.toUpperCase())}
+                                    onChange={(e) => setVehicleNumber(e.target.value.toUpperCase())}
                                 />
-                                <button className="md:px-10 md:hidden  px-2 py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600" onClick={setRcModalOpen}>
+
+                                <button
+                                    className="md:px-10 md:hidden px-2 py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600"
+                                    onClick={setRcModalOpen}
+                                >
                                     {loading ? "Loading..." : "Get RC"}
                                 </button>
+
+
                             </div>
-                            <button className="md:px-20 px-2 hidden md:flex py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600" onClick={setRcModalOpen}>
+
+                            <button
+                                className="md:px-20 px-2 hidden md:flex py-2 bg-blue-500 whitespace-nowrap text-white font-semibold rounded hover:bg-blue-600"
+                                onClick={setRcModalOpen}
+                            >
                                 {loading ? "Loading..." : "Get RC"}
                             </button>
+
+
                         </div>
 
                         <div className="flex md:gap-4 gap-2 mt-3 items-center text-sm justify-end w-full">
-                            <h3 className="mg:text-xl text-sm font-bold ">For&nbsp;Bulk&nbsp;RC</h3>
+                            <h3 className="mg:text-xl text-sm font-bold">For&nbsp;Bulk&nbsp;RC</h3>
 
-                            <a className="bg-purple-500 text-white py-2 md:px-10 px-3 rounded font-semibold hover:bg-purple-600" href='/modifiedSample Vrn.csv' download={true}>
+                            <a
+                                className="bg-purple-500 text-white py-2 md:px-10 px-3 rounded font-semibold hover:bg-purple-600"
+                                href="/modifiedSample Vrn.csv"
+                                download={true}
+                            >
                                 Sample&nbsp;CSV
                             </a>
+
                             <label
-                                htmlFor='downloadBulkRcInput'
-                                className="bg-green-500 text-white py-2 md:px-10 px-3 font-semibold rounded hover:bg-green-600 cursor-pointer">
+                                htmlFor="downloadBulkRcInput"
+                                className="bg-green-500 text-white py-2 md:px-10 px-3 font-semibold rounded hover:bg-green-600 cursor-pointer"
+                            >
                                 Upload&nbsp;CSV
                             </label>
                             <input
                                 type="file"
                                 accept=".csv"
-                                className='hidden'
-                                id='downloadBulkRcInput'
+                                className="hidden"
+                                id="downloadBulkRcInput"
                                 onChange={handleDownloadBulkRc}
                             />
 
+                            {/* ✅ New Checkboxes */}
+                            <div className="flex gap-4 items-center">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={typeOfRc === "digital"}
+                                        onChange={(e) => {
+                                            setTypeOfRc(e.target.checked ? "digital" : "normal");
+                                        }}
+                                        className="w-4 h-4 accent-blue-600 cursor-pointer"
+                                    />
+                                    <span className="text-sm font-medium">Digital RC</span>
+                                </label>
+
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={typeOfRc === "normal"}
+                                        onChange={(e) => {
+                                            setTypeOfRc(e.target.checked ? "normal" : "digital");
+                                        }}
+                                        className="w-4 h-4 accent-blue-600 cursor-pointer"
+                                    />
+                                    <span className="text-sm font-medium">Normal RC</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
+
                 </div>
 
                 {/* Recent Transactions */}
