@@ -9,8 +9,8 @@ const CreateRCModal = ({ closeCreateModal }: any) => {
     // State to store all the input field values
     const [formData, setFormData] = useState<any>({
         registrationNumber: "UP0982312",
-        ownerName: "Vineet ",
-        fatherName: "Sabhjaeet Yadav",
+        ownerName: "John Deo",
+        fatherName: "Richard Roe",
         address: "Kalwar Road, Jhotwara, Jaipur, Rajasthan, 302012",
         ownershipType: "INDIVIDUAL",
         chasisNumber: "12313212313",
